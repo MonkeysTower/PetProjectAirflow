@@ -53,6 +53,24 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres-db-volume:/var/lib/postgresql/data
+    command: >
+      sh -c '
+        docker-entrypoint.sh postgres &
+
+        until pg_isready -U ${POSTGRES_USER} -h localhost -p 5432; do
+          echo "⏳ Ожидание запуска PostgreSQL..."
+          sleep 2
+        done
+
+        if ! psql -U ${POSTGRES_USER} -h localhost -tAc "SELECT 1 FROM pg_database WHERE datname = '\''${MB_DB_NAME}'\''" | grep -q 1; then
+          echo "🗄️ Создаём базу данных ${MB_DB_NAME}..."
+          createdb -U ${POSTGRES_USER} ${MB_DB_NAME}
+        else
+          echo "✅ База данных ${MB_DB_NAME} уже существует."
+        fi
+
+        wait
+      '
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow"]
       interval: 10s
@@ -269,6 +287,22 @@ services:
       - airflow
     depends_on:
       <<: *airflow-common-depends-on
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: metabase_dashboard
+    ports:
+      - "${MB_PORT}:3000"
+    environment:
+      MB_DB_TYPE: postgres
+      MB_DB_HOST: postgres
+      MB_DB_PORT: 5432
+      MB_DB_DBNAME: ${MB_DB_NAME}
+      MB_DB_USER: ${POSTGRES_USER}
+      MB_DB_PASS: ${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres
+    restart: always
 
 volumes:
   postgres-db-volume:
