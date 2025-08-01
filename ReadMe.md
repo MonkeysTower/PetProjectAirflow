@@ -99,12 +99,12 @@ https://localhost:{8081 или указаный вами в .env}
 
 5. Запустить DAG
 
-## Контактная информация
-Если остались какие-то вопросы или предложения, не стесняйтесь свяжитесь со мной:
- - Email: Trifandre@yandex.ru
- - GitHub: <https://github.com/MonkeysTower/>
-
 6. Зайти на платформу Metabase и создать дашборд 
 ```https
 https://localhost:{3000 или указаный вами в .env}
 ```
+
+## Контактная информация
+Если остались какие-то вопросы или предложения, не стесняйтесь свяжитесь со мной:
+ - Email: Trifandre@yandex.ru
+ - GitHub: <https://github.com/MonkeysTower/>
